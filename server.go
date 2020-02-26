@@ -22,7 +22,7 @@ func main() {
 
 	log.Println("starting query")
 
-	rows, err := db.DB.Query("SELECT name, location, idStatus FROM servers WHERE physical = 1")
+	rows, err := db.DB.Query("SELECT name, location, idKind, idStatus FROM servers WHERE physical = 1")
 	defer rows.Close()
 	if err != nil {
 		log.Println("error 1: " + err.Error())
@@ -33,12 +33,72 @@ func main() {
 	for rows.Next() {
 		name := ""
 		location := ""
+		idKind := 0
 		idStatus := 0
 
-		rows.Scan(&name, &location, &idStatus)
+		rows.Scan(&name, &location, &idKind, &idStatus)
 
-		out += name + "\t" + location + "\t" + frutils.ToString(idStatus) + "\n"
+		kind := getKindFromID(idKind)
+		status := getStatusFromID(idStatus)
+
+		out += name + "\t" + status + "\t" + kind + location + "\t" + "\n"
 	}
 
 	frutils.CreateFile("query.txt", out)
+}
+
+func getKindFromID(idKind int) string {
+	if idKind == 0 {
+		return "Desconocido"
+	}
+	if idKind == 1 {
+		return "Appliance"
+	}
+	if idKind == 2 {
+		return "Blade"
+	}
+	if idKind == 3 {
+		return "Hoja"
+	}
+	if idKind == 4 {
+		return "Librería"
+	}
+	if idKind == 5 {
+		return "VM"
+	}
+	if idKind == 6 {
+		return "PC"
+	}
+	if idKind == 7 {
+		return "Servidor"
+	}
+	if idKind == 8 {
+		return "Almacenamiento"
+	}
+	if idKind == 9 {
+		return "Switch Blade"
+	}
+	if idKind == 10 {
+		return "Switch FC"
+	}
+	return ""
+}
+
+func getStatusFromID(idStatus int) string {
+	if idStatus == 0 {
+		return "Desconocido"
+	}
+	if idStatus == 1 {
+		return "Activo"
+	}
+	if idStatus == 2 {
+		return "Desguasado"
+	}
+	if idStatus == 3 {
+		return "Apagado"
+	}
+	if idStatus == 4 {
+		return "Inactivo"
+	}
+	return ""
 }
